@@ -199,16 +199,15 @@ impl<T: Ord + Clone> Ecdf<T> {
 /// assert_eq!(value, 0.5);
 /// ```
 pub fn ecdf<T: Ord>(samples: &[T], t: T) -> f64 {
-    let mut num_samples_leq_t = 0;
-    let mut length = 0;
-
-    for sample in samples.iter() {
-        length += 1;
-        if *sample <= t {
-            num_samples_leq_t += 1;
-        }
-    }
-
+    let (length, num_samples_leq_t) = samples.iter()
+        .fold((0, 0), |(a, b), sample| {
+            (a + 1,
+             if *sample <= t {
+                b + 1
+            } else {
+                b
+            })
+        });
     assert!(length > 0);
 
     num_samples_leq_t as f64 / length as f64
